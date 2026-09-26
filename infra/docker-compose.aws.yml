@@ -1,0 +1,12 @@
+services:
+  coturn:
+    command:
+      - "-c"
+      - "/etc/coturn/turnserver.conf"
+      - "--static-auth-secret=${TURN_SHARED_SECRET}"
+      - "--realm=${TURN_REALM}"
+      - "--external-ip=${EIP}"
+      - "--Verbose"
+  signaling:
+    environment:
+      TURN_HOSTNAME: "${EIP}"

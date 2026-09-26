@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+  <title>FizzShare — Share files privately, fast and without size limit</title>
+  <meta name="description" content="FizzShare sends your files privately and fast. No file size limit. No registration. Peer to peer. End to end encrypted." />
+  <meta name="theme-color" content="#b9e93c" />
+  <link rel="icon" href="data:," />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Roboto:wght@300;400;500;600;700&display=swap" />
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body class="main">
+  <noscript>
+    <div class="noscript"><h1>Oops</h1><span>you need to enable javascript to use FizzShare.</span></div>
+  </noscript>
+
+  <!-- Fizzy backdrop: rising bubbles -->
+  <div id="bubbles" aria-hidden="true">
+    <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+  </div>
+
+  <header class="app-header">
+    <a class="header-logo" href="/">
+      <div class="logo-circle" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+          <path d="M12 3c3 3.4 5 6 5 9a5 5 0 0 1-10 0c0-3 2-5.6 5-9z" />
+          <circle cx="10" cy="13" r="1" /><circle cx="14" cy="12" r="1" />
+        </svg>
+      </div>
+      <div class="title-and-slogan"><span class="title">fizzshare</span><span class="slogan">Sharing that pops</span></div>
+    </a>
+    <div class="container-menu-desktop">
+      <nav class="links-desktop" aria-label="Site">
+        <a class="menu-link" href="#how">What is FizzShare?</a>
+        <a class="menu-link" href="#log-section">Live status</a>
+      </nav>
+      <div class="menu-buttons">
+        <a class="menu-button receive-open">I'm receiving</a>
+        <a id="btn-share" class="menu-button-outlined">
+          <svg viewBox="0 0 20 20" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M5 3v10M3 15h12M2 12v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3" /></svg>
+          Select files
+        </a>
+      </div>
+    </div>
+    <svg class="menu-button-mobile" viewBox="0 0 512 512" height="30" width="30" aria-hidden="true"><path fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="48" d="M88 152h336M88 256h336M88 360h336" /></svg>
+  </header>
+
+  <div class="container-main">
+    <!-- Landing (sender page) -->
+    <section id="landing" class="page-sender">
+      <input id="file-input" type="file" name="files" multiple style="display:none" />
+
+      <div class="content-top">
+        <div class="left">
+          <div id="drop-zone" class="select-files" tabindex="0" role="button" aria-label="Select or drag files to share">
+            <a class="button on-dark btn-main-share">Select files
+              <svg viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M10 4v12M4 10h12" /></svg>
+            </a>
+            <div class="container-file-drop">
+              <span class="plus" aria-hidden="true">+</span>
+              <span class="drop-them-here">Click to browse or drag files here to start sharing</span>
+            </div>
+            <a class="home-link receive-open">Or receive files with a code</a>
+          </div>
+        </div>
+        <div class="right">
+          <div class="right-centered">
+            <h1>Share files straight from your device.</h1>
+            <p class="description">Send files of any size directly from your device. Nothing is stored online — close your browser and it stops. Fizzy simple.</p>
+            <div class="features">
+              <div class="feature"><span class="feature-dot"></span><span>No size limit</span></div>
+              <div class="feature"><span class="feature-dot"></span><span>Peer-to-peer</span></div>
+              <div class="feature"><span class="feature-dot"></span><span>Blazingly fast</span></div>
+              <div class="feature"><span class="feature-dot"></span><span>End-to-end encrypted</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="content-middle"><div class="scroll"></div></div>
+
+      <div class="content-bottom">
+        <div class="container-informative" id="how">
+          <p class="eyebrow">How it works</p>
+          <h2>What is FizzShare?</h2>
+          <p class="text-explained">
+            FizzShare is a peer-to-peer file sharing service built for a Computer Networks term project.
+            Your files travel over WebRTC — SCTP/DTLS/ICE — straight from one device to the other.
+            We store nothing online: simply close your browser to stop sending.
+          </p>
+          <p class="secure hidden" id="secure-note"><b>Hostile origin:</b> this page is not served over HTTPS, so WebRTC is disabled. Ask the host for the secure link.</p>
+          <div class="divider-fizz"></div>
+          <div class="hero-grid">
+            <div class="item-info"><div class="container-circle-icon"><div class="img-info">📦</div></div><div class="block-info"><h3>Shared straight from your device</h3><p>WebRTC finds the shortest path between sender and receiver — sometimes your data never even leaves the building.</p></div></div>
+            <div class="item-info"><div class="container-circle-icon"><div class="img-info">📏</div></div><div class="block-info"><h3>No more file size limits</h3><p>Because we never store the data, there's nothing to limit. Share files of any size, mindful of your own data usage.</p></div></div>
+            <div class="item-info"><div class="container-circle-icon"><div class="img-info">🔒</div></div><div class="block-info"><h3>Only the receiver can read it</h3><p>DTLS-encrypted end to end, plus a per-file SHA-256 checksum both sides verify after every transfer.</p></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Receiver: enter a code -->
+    <section id="receive-flow" class="flow hidden">
+      <div class="container-modal">
+        <h2 class="header-top">Receive files</h2>
+        <p>Enter the 6-character code from the share link.</p>
+        <div class="code-box">
+          <input id="room-code" maxlength="6" placeholder="ABC DEF" autocomplete="off" spellcheck="false" />
+          <button id="btn-join" class="button on-white" type="button">Join</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Sender: picked files + share link -->
+    <section id="send-flow" class="flow hidden">
+      <div class="container-modal board">
+        <div class="flow-head">
+          <h2>Ready to share</h2>
+          <p>Files leave your device the moment someone opens the link — nothing is stored online.</p>
+        </div>
+        <div id="file-picker-list"></div>
+        <div id="share-box" class="share-box hidden">
+          <div class="qr-row">
+            <canvas id="qr-canvas" width="120" height="120" aria-label="QR code of the share link"></canvas>
+            <div class="qr-side">
+              <p class="drop-them-here">Send this link to whoever should receive the files — or let them scan the code:</p>
+              <div class="code-box">
+                <input id="share-link" readonly spellcheck="false" />
+                <button id="btn-copy-link" class="button on-white" type="button">Copy link</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="actions">
+          <button id="btn-create-room" class="button on-white hidden" type="button">Create share link</button>
+          <button id="btn-send" class="button on-white hidden" type="button" disabled>Send files</button>
+          <button id="btn-pause" class="button outlined hidden" type="button">Pause</button>
+          <button id="btn-cancel" class="button outlined hidden" type="button">Cancel</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Room / connection -->
+    <section id="room" class="flow hidden">
+      <div class="container-modal board">
+        <div id="room-banner" class="room-banner"></div>
+        <dl id="connection-summary" class="summary chips">
+          <div><dt>Connection</dt><dd id="conn-state">idle</dd></div>
+          <div><dt>Candidate path</dt><dd id="conn-path">—</dd></div>
+          <div><dt>RTT</dt><dd id="conn-rtt">—</dd></div>
+        </dl>
+        <div id="progress-area" class="hidden"></div>
+        <div id="received-files" class="hidden">
+          <h3>Downloaded files</h3>
+          <p class="hint">Each file was handed to your browser's downloader. They stay available here while this tab is open.</p>
+          <ul id="received-list"></ul>
+          <button id="btn-download-all" class="button on-white hidden" type="button">Download all again</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- DTLS fingerprint safety check -->
+    <section id="safety" class="flow hidden">
+      <div class="container-modal board">
+        <h2>Safety check (DTLS fingerprint)</h2>
+        <p class="hint">Read these two codes to each other out-of-band. They must match; otherwise a middle-man may have swapped certificates.</p>
+        <dl class="summary">
+          <div><dt>My certificate</dt><dd><code id="safety-local">—</code></dd></div>
+          <div><dt>Peer certificate</dt><dd><code id="safety-remote">—</code></dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <!-- Live status / network trace (dev + viva panel) -->
+    <section id="log-section" class="log-panel">
+      <div class="log-head">
+        <h3>Live status <span class="fizz-cap">●</span></h3>
+        <button id="btn-inspector" class="button outlined small" type="button">Inspector</button>
+      </div>
+      <div id="phase-log" class="log"></div>
+      <div id="inspector-root" class="hidden"></div>
+    </section>
+  </div>
+
+  <div id="toast" class="notification hidden">Link copied to clipboard</div>
+
+  <script src="/app.js"></script>
+</body>
+</html>

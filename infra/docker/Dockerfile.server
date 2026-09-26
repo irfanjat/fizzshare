@@ -1,0 +1,38 @@
+# ── peershare signaling server, multi-stage ──────────────────────────────────
+# Stage 1: build the client bundle (esbuild) — artifacts land in ../public.
+# Stage 2: compile the server to dist/.
+# Stage 3: thin runtime — production deps + dist + public/. Serves the app,
+#          the /ws control plane, /healthz and /metrics, so Caddy has exactly
+#          one upstream to proxy.
+
+# Build the browser bundle -----------------------------------------------
+FROM node:24-alpine AS client
+WORKDIR /src/client
+COPY client/package.json client/package-lock.json ./
+RUN npm ci
+COPY client/scripts ./scripts
+COPY client/src ./src
+COPY client/index.html client/style.css ./
+RUN npm run build
+# → /src/public/app.js (+ sourcemap) + index.html
+
+# Compile the server ------------------------------------------------------
+FROM node:24-alpine AS server-build
+WORKDIR /app
+COPY server/package.json server/package-lock.json ./
+RUN npm ci
+COPY server/ ./
+RUN npm run build
+# → /app/dist/*.js
+
+# Runtime image -----------------------------------------------------------
+FROM node:24-alpine AS runtime
+WORKDIR /app
+ENV NODE_ENV=production
+COPY --from=server-build /app/package.json /app/package-lock.json ./
+RUN npm ci --omit=dev
+COPY --from=server-build /app/dist ./dist
+COPY --from=client /src/public ./public
+EXPOSE 8080
+USER node
+CMD ["node", "dist/index.js"]

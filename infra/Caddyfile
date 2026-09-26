@@ -1,0 +1,31 @@
+# ── peershare — Caddy reverse proxy / TLS termination (Phase 5) ──────────────
+# Caddy 2.8. One public origin: browsers talk to Caddy on :443 (WSS + HTTPS),
+# it forwards everything to the signaling container on the compose network.
+#
+# TLS: with a real DNS name Caddy fetches an ACME certificate automatically
+# (set SITE_ADDRESS=peershare.example.com). For local testing without DNS use
+# plain HTTP, which is still a secure context on localhost:
+#   SERVICE_ADDRESS=localhost:80
+# (browsers allow WebRTC on http://localhost). A self-signed option:
+#   SERVICE_ADDRESS=localhost:443   +   tls internal
+#
+# All directives here are inherited from docs/01 hardening decisions.
+
+{$SITE_ADDRESS:localhost} {
+
+	encode gzip
+
+	# WebRTC only runs in a secure context, so we must NOT let the browser
+	# see an insecure origin: explicit connection branding + HSTS.
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "DENY"
+		Referrer-Policy "no-referrer"
+		Content-Security-Policy "default-src 'self' 'unsafe-inline' data: blob:; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' wss: ws:; frame-ancestors 'none'; base-uri 'none'; object-src 'none'"
+	}
+
+	# One upstream: the signaling node serves the app, the WebSocket control
+	# plane, /healthz and /metrics.
+	reverse_proxy signaling:8080
+}
