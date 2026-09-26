@@ -47,7 +47,7 @@ Sender runs **two passes** over the file: pass 1 streams the whole file through 
 (populates the progress bar / hash meta), pass 2 streams + chunks it out. This gives the receiver a pre-transfer
 hash without buffering the file in memory.
 
-## 4. Backpressure (the part your viva will probe)
+## 4. Backpressure
 
 Untamed, `send()` never blocks — buffered bytes balloon and the browser OOMs. Our pump:
 

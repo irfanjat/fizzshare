@@ -42,7 +42,7 @@ go browser-to-browser over UDP and the server sees nothing but STUN/TURN control
 
 ## 3. Why the architecture is the way it is
 
-| Decision | Reasoning (for your viva) |
+| Decision | Reasoning |
 |---|---|
 | WebRTC DataChannel instead of HTTP upload/download | DataChannels are SCTP-over-DTLS-over-UDP: built-in reliability, ordered delivery, and end-to-end encryption; bytes move peer-to-peer, so the server can't scale-limit or inspect file contents. This is exactly why ToffeeShare/ShareDrop-style apps work on free infrastructure. |
 | WebSocket signaling | The signaling channel is pure control-plane metadata. WebSocket is message-oriented (no HTTP request/response framing cost) and bidirectional, which is a natural fit for SDP/ICE exchange. TLS (wss) protects signaling and is also required for the browser to grant `RTCPeerConnection` secure-context APIs. |

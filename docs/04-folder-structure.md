@@ -60,7 +60,7 @@ peershare/
 └── README.md
 ```
 
-## Why these boundaries (viva-deliverable reasoning)
+## Why these boundaries
 
 - **client / server split at the `ws` boundary is deliberate**: the server never imports any file-handling code,
   so there is *nothing* for it to leak even if it wanted to. Files live only inside `.ts` browser modules.

@@ -29,7 +29,7 @@ It does **not** handle, store, buffer, or log file data. There is no file code i
 `iceServers` always includes the self-hosted STUN listener; if `TURN_SHARED_SECRET` is configured it also
 includes a TURN entry whose `username/credential` were minted for this session.
 
-## 3. TURN REST credentials (the part your viva will probe)
+## 3. TURN REST credentials
 
 ```
 username   = "<unix-expiry-timestamp>:<random-hex>"

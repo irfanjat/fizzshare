@@ -2,7 +2,7 @@
  * inspector.ts — live Network Inspector panel (Phase 4).
  *
  * Polls getStats() every second and renders the underlying WebRTC machinery so
- * the viva can see a real ICE/DTLS/SCTP session: selected candidate pair, RTT
+ * so you can watch a real ICE/DTLS/SCTP session: selected candidate pair, RTT
  * trend, transport throughput, packet loss, and the full candidate set. A
  * single toggle lets you shrink the candidate pool (host-only / relay-only)
  * and watch the connection re-gather — a live demonstration of what TURN is

@@ -1,6 +1,6 @@
 # 02 — Protocol Stack (WebRTC DataChannel)
 
-This is the single most important thing to be able to explain in the viva: **exactly what bytes travel between
+This is the part worth understanding first: **exactly what bytes travel between
 the two browsers, and at what layer, for a file transfer.**
 
 ## 1. The full stack, bottom-up

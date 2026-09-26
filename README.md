@@ -4,7 +4,7 @@
 
 Live right now: **https://52.4.112.224.sslip.io/**
 
-I built this for a Computer Networks course, but the interesting part was never the UI. It was making two browsers on two completely different networks actually find each other — and then making that failure mode visible instead of mysterious.
+The interesting part was never the UI. It was making two browsers on two completely different networks actually find each other — and then making that failure mode visible instead of mysterious.
 
 ---
 
@@ -39,17 +39,7 @@ Two things I like about this stack:
 
 Both ends hash every file with SHA-256 when it lands. If the digests don't match, the UI says so out loud instead of quietly handing you a corrupt download.
 
-## The hard parts (the part I'd actually defend in an interview)
-
-**One-sided ICE almost broke every cross-device transfer.** Trickled ICE means each side gathers candidates and ships them over the signaling channel. I'd wired that callback for the sender only. The sender's candidates reached the receiver; the receiver's candidates were silently dropped. Two desktops on the same network connected fine — which is exactly why it looked healthy. The moment real devices were involved, every connection stalled in `checking` forever. The fix is one line, and the lesson wasn't: *a demo on your own LAN is not evidence that networking works.*
-
-**TURN was dead, and quiet about it.** coturn had been started with `--static-auth-secret=`, `--realm=`, `--external-ip=` — all three empty, because the values came from shell interpolation that never ran. It accepted no allocations and logged nothing alarming. Direct paths still worked, so again: invisible until you needed the fallback. Now the compose override is asserted from the same env file the server reads its secret from, and cross-NAT relay is a passing test rather than an assumption.
-
-**Nobody is going to click a button to fail a transfer, so it fails itself.** ICE failures trigger a renegotiation with a hard cap — two restarts, then it gives up and says so, instead of looping forever and melting the battery.
-
-**Backpressure is the difference between "works on my laptop" and "works."** Chunks are 16 KiB and the sender waits for `bufferedAmount` to drop below a low-water mark before queueing more. Without it, a fast sender on a slow link just builds an unbounded queue in browser memory and the tab dies on a big file.
-
-**A share link is a public URL, so the room has manners.** Rooms cap at 2 peers, expire after an hour, lock for 60 seconds after 5 failed joins (so codes can't be brute-forced), and the signaling server rate-limits both messages and join attempts. Payloads over 1 MiB are rejected outright, and every inbound message goes through a validator that rejects malformed SDP, junk ICE candidates, and unknown message types before it reaches a room.
+Transfer reliability is handled rather than assumed: chunks go out at 16 KiB and the sender waits for the channel's buffer to drain below a low-water mark, so a fast sender on a slow link can't build an unbounded queue and kill the tab. If ICE fails, the connection renegotiates itself up to two times, then gives up and says so instead of retrying forever.
 
 ## What's in here
 

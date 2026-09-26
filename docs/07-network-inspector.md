@@ -4,7 +4,7 @@
 
 ## 1. What it shows (all from `RTCPeerConnection.getStats()`)
 
-| Panel row | Source | Viva line |
+| Panel row | Source | What it shows |
 |---|---|---|
 | Phase | `PeerConnectionManager` event stream | the state machine you trace |
 | ICE / DTLS / Peer Connection / DataChannel state | `pc.iceConnectionState`, transport `dtlsState`, `pc.connectionState`, `dc.readyState` | protocol-stack compliance |
