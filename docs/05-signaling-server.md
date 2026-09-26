@@ -1,4 +1,4 @@
-# 05 — Signaling Server (Phase 2)
+# 05 — Signaling Server
 
 **Location:** `server/` — Node.js 20+, TypeScript, `ws` + `express`, zero other deps.
 
@@ -41,22 +41,22 @@ credential = base64( HMAC-SHA1( sharedSecret, username ) )
 - The server signs a fresh pair for every `create-room`/`join-room`. Lifetime defaults to 3600 s (≥ room TTL),
   so a credential is useless shortly after the session ends and can't be replayed for free relay minutes later.
 - If the secret/hostname env is absent, the server still runs — it simply issues STUN-only configs. That is
-  your **"why TURN fails" demo**: clients then have only host+srflx candidates (config knobs in Phase 3/4 let
+  your **"why TURN fails" demo**: clients then have only host+srflx candidates (the inspector's policy toggles let
   you force `relay`). See `docs/08` test plan.
 
 ## 4. Security decisions (and the reasoning to defend)
 
 | Mechanism | Why |
 |---|---|
-| Origin check on WS upgrade | Cross-site WebSocket Hijacking: a malicious origin's JS holds no credentials but the browser sends cookies on its behalf. Our socket is credentialless, but an attacker site could still make your browser open a socket and *gray-hole* it or trick a user into a fake room. Rejecting unknown `Origin` bins that. |
+| Origin check on WS upgrade | Cross-site WebSocket Hijacking: a malicious origin's JS holds no credentials but the browser sends cookies on its behalf. The socket is credentialless, but an attacker site could still make your browser open a socket and *gray-hole* it or trick a user into a fake room. Rejecting unknown `Origin` bins that. |
 | Strict per-message validation | `parseClientMessage` is the single entry point for inbound bytes. Malformed types/shapes/oversized SDP are rejected before routing, and the socket is closed (1008). Baggage: message shape is whitelisted, not blacklisted. |
-| `maxPayload = 1 MiB`, message + join token buckets | SDP is a few KiB with trickle ICE; candidate floods and repeated bogus joins cost us CPU. Per-IP buckets cap both. |
+| `maxPayload = 1 MiB`, message + join token buckets | SDP is a few KiB with trickle ICE; candidate floods and repeated bogus joins cost CPU. Per-IP buckets cap both. |
 | Room-code lockout | After 5 failed joins on one code (or a TTL of 60 s lock), the code refuses joins. Combined with the ~15 min room TTL this makes brute-forcing a live room infeasible in practice. |
 | Never log payloads | Logs record event names + room codes only. SDP contains IPs/fingerprints, ICE candidates contain addresses — none of it is logged. `LOG_LEVEL=debug` adds only control-plane counters. |
 | Client telemetry is the **only** post-facto signal about relay vs direct | The server physically cannot observe the data path (it's P2P). `telemetry` messages carry just `pairType/rtt/duration` (no file metadata), so Prometheus can plot *direct vs relay ratio* honestly. |
 | IP provenance | `X-Forwarded-For` first hop is trusted because Caddy is the single TLS terminator in front; documented in user guides so people don't run it naked on the internet. |
 
-## 5. Remaining threat model (for the report's security section)
+## 5. Remaining threat model
 
 - **Malicious/injected signaling server** could swap DTLS fingerprints in SDP or replay SDP. Mitigation:
   the two humans compare the safety code (SHA-256 of each peer cert) out-of-band. The server cannot forge
@@ -66,7 +66,7 @@ credential = base64( HMAC-SHA1( sharedSecret, username ) )
 - **Browser JS supply chain** (compromised npm/build tooling → malicious bundle). Out of scope; noted.
 - **Massive relay abuse via stolen credentials**: bounded to credential lifetime + lockouts. Not perfectly
   prevented (TURN inherently burns bandwidth), hence the self-hosted coturn with `min_port/max_port` limits
-  from Phase 5.
+  from the deployment work.
 
 ## 6. Running and testing
 

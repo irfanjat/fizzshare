@@ -1,4 +1,4 @@
-# 08 — Deployment: Docker Compose + coturn + Caddy (Phase 5)
+# 08 — Deployment: Docker Compose + coturn + Caddy
 
 This is the whole app as a single-node production stack — one `docker compose up`
 brings up signaling + coturn + TLS. Nothing here ever sees file bytes: the data
@@ -79,7 +79,7 @@ podman compose -f infra/docker-compose.yml up -d --build
 # app + static + health + metrics through Caddy
 curl -so /dev/null -w '%{http_code} ' http://localhost:8081/{,app.js,healthz,metrics}
 
-# signaling control plane: create/join/peer-joined + Phase-4 restart relay,
+# signaling control plane: create/join/peer-joined + restart relay,
 # and inspect the REST ICE creds the server mints (vanilla WS → Caddy).
 # (Ad-hoc `ws` script, not part of the repo — see docs/03 message shapes.)
 # Node: connect ws://localhost:8081/ws with Origin: http://localhost:8081,
@@ -98,13 +98,13 @@ press **Relay only** — verify the selected path flips to the `192.168.1.x:491x
 relay candidate, and **Host only** (empty `iceServers`, policy `all`) fails to
 re-gather across NAT — the "why TURN" moment.
 
-## 6. Security decisions (call these out in the report)
+## 6. Security decisions
 
 - Time-limited TURN REST creds: coturn `use-auth-secret`, not `lt-cred-mech` —
   a leaked bundle leaks a future-dated token, not a long-lived one (`config.ts`,
   `turn.ts`).
 - Relay is not an open proxy: `denied-peer-ip` blocks loopback, CGNAT, and RFC
-  1918 destinations. Our alloc test hit `403 Forbidden IP` when relaying to
+  1918 destinations. The allocation test hit `403 Forbidden IP` when relaying to
   127.0.0.1 — hardening verified working, by accident.
 - No TLS 1.0/1.1 anywhere (`no-tlsv1`, `no-tlsv1_1`); `fingerprint` on all STUN.
 - CSP/HSTS/X-Frame-Options/Referrer-Policy set at the edge (Caddy), so the app
@@ -113,7 +113,7 @@ re-gather across NAT — the "why TURN" moment.
 - Origin check is the signaling server's own admission control (only listed
   origins may open the WebSocket).
 
-## 7. Cloud (Phase 6 will wire this)
+## 7. Cloud
 
 On EC2 behind SNAT with an Elastic IP, coturn must advertise the EIP in relay
 candidates — Compose/podman user-data will inject `--external-ip=<EIP>`, and the

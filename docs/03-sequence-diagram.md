@@ -1,6 +1,6 @@
 # 03 — Sequence Diagram (Mermaid)
 
-Diagram below, and the matching message-by-message walkthrough. This is your artifact for the report and demo.
+Diagram below, and the matching message-by-message walkthrough. This is the artifact to read alongside the walkthrough.
 
 ```mermaid
 sequenceDiagram
@@ -82,15 +82,15 @@ sequenceDiagram
    so codes are hard to brute-force *before* the room dies.
 2. **Offer/answer must be exchanged before ICE candidates complete** (trickle ICE):
    - Signaling carries candidates **as they fire**, not in a bloated final SDP. The browser fires `icecandidate`
-     events one-by-one; we forward each as `{type:'ice'}`.
+     events one-by-one; each is forwarded as `{type:'ice'}`.
    - The risk ("trickle ICE timing") is if peer B's `onicecandidate` events arrive before A's offer created the
-     connection, or if the `icecandidate` handler isn't installed before `createAnswer()` runs. Our handler is
+     connection, or if the `icecandidate` handler isn't installed before `createAnswer()` runs. The handler is
      installed at construction time and only adds candidates when the remote description exists.
 3. **ICE pick is observable**, not magic: `RTCPeerConnection.getStats().then(s => s.selectedCandidatePair)`
-   tells us *which* of host/srflx/relay won, where the two ends are, and the measured RTT — this is the Network
+   shows *which* of host/srflx/relay won, where the two ends are, and the measured RTT — this is the Network
    Inspector panel's data source.
 4. **DTLS fingerprints**: each side's self-signed certificate fingerprint is sent in the SDP (`a=fingerprint:`).
-   That's where a passive/active MITM on signaling could swap fingerprints → we display the hash to both humans and
+   That's where a passive/active MITM on signaling could swap fingerprints → the hash is displayed to both humans, and
    they read it aloud to each other over phone/voice. Implementing the comparison is genuinely useful, and doing it
    via getStats (not trusting signaling) is the honest method.
 5. **Transfers are relaunch-able**: on any candidate-pair failure the connection is torn down, ICE restarted, then

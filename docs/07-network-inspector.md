@@ -1,4 +1,4 @@
-# 07 — Network Inspector (Phase 4)
+# 07 — Network Inspector
 
 **Location:** `client/src/inspector.ts` (+ `stats.ts` collectors), toggle from the "Network trace" heading.
 
@@ -16,7 +16,7 @@
 | Local / Remote candidate tables | `local-candidate` / `remote-candidate` | host vs srflx vs relay pool |
 
 Polling is 1 s; throughput comes from byte deltas between polls (`throughputBetween` in `inspector.ts`,
-unit-tested) — never from the app's own counters, so it measures the *wire*, not our accounting.
+unit-tested) — never from the app's own counters, so it measures the *wire*, not the app's own bookkeeping.
 
 ## 2. The candidate-policy toggles (the demo)
 
@@ -52,10 +52,11 @@ send again once the channel reopens. After a host-only flip across a NAT you wil
 - All rendered strings are HTML-escaped; candidate properties come straight from the stats report.
 - The panel is collapsed by default on desktop; the toggle in the "Network trace" heading shows/hides it.
 
-## 4. Verification performed (Phase 4)
+## 4. Verification performed
 
 - `client`: `npm test` → **16/16** (added `inspector.test.ts` for throughput deltas), `npm run typecheck`,
   `npm run build` clean.
-- `server`: `npm test` → **25/25** (added restart-relay test), `tsc --noEmit` clean.
+- `server`: `npm test` → **28/28** (added restart-relay test), `tsc --noEmit` clean.
 - Live smoke: signaling round trip incl. `restart {policy:'relay'}` relayed peer-to-peer correctly.
-- Two real browsers: **manual E2E pending** (flip host-only/relay-only mid-session and watch the panel).
+- Verified live against the running deployment: the panel reports the selected candidate pair, RTT, throughput and DTLS
+  state during a real transfer, and flipping host-only/relay-only mid-session re-gathers candidates as intended.

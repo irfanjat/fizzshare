@@ -33,26 +33,26 @@ the two browsers, and at what layer, for a file transfer.**
 
 ### 2.1 UDP — the brick that makes P2P possible
 - UDP has **no session state** at the NAT/firewall, which is exactly why it survives NAT traversal better than TCP.
-- A UDP socket binding on port P in the browser creates a NAT mapping; STUN lets us discover the public `ip:port`
-  that mapping maps to, and we can predict/relate that mapping for the candidate-pair checks.
-- Pitfall we must respect: **UDP datagrams larger than the path MTU get fragmented or dropped**. WebRTC + SCTP
-  handles this internally, but our custom chunking (16 KiB) must be *resegmented* by SCTP into MTU-sized packets,
+- A UDP socket binding on port P in the browser creates a NAT mapping; STUN reveals the public `ip:port`
+  that mapping maps to, and that mapping is what the candidate-pair checks relate to.
+- Pitfall to respect: **UDP datagrams larger than the path MTU get fragmented or dropped**. WebRTC + SCTP
+  handles this internally, but the custom chunking (16 KiB) must be *resegmented* by SCTP into MTU-sized packets,
   not trusted to fit one datagram.
 
 ### 2.2 DTLS — confidentiality, integrity, and identity
 - DTLS = TLS adapted for UDP: adds explicit sequence numbers, retransmission of handshake flights, and reassembly,
   because UDP does not guarantee ordering.
-- Each browser generates a self-signed X.509 certificate. The **SHA-256 fingerprint** of that certificate is what we
-  show as the "safety code". If the two users read identical codes to each other, they know no one in the middle
+- Each browser generates a self-signed X.509 certificate. The **SHA-256 fingerprint** of that certificate is what
+  gets shown as the "safety code". If the two users read identical codes to each other, they know no one in the middle
   swapped certificates — this is the manual out-of-band authentication ("key continuity" style).
 - After handshake: every SCTP packet is wrapped in a DTLS record, encrypted with AEAD, so **packet loss is just a
   dropped datagram; confidentiality is guaranteed even if the TURN relay forwards it**.
 
 ### 2.3 SCTP — the "TCP done right" over UDP
-- SCTP gives us the same guarantees TCP gives HTTP (reliable, ordered, in-order delivery) **without** opening a TCP
+- SCTP provides the same guarantees TCP gives HTTP (reliable, ordered, in-order delivery) **without** opening a TCP
   connection or dealing with TCP-over-TCP problems (which would collapse if TURN relayed TCP inside DTLS).
-- Multiple "streams" inside one association → we can (in a future version) give metadata and chunks separate
-  streams. We keep two streams: control + data.
+- Multiple "streams" inside one association → metadata and chunks stay separate without extra framing. The app opens two:
+  control + data.
 - Congestion control: SCTP does its own slow-start / congestion avoidance, so throughput is fair to other traffic on
   the path and avoids melting the user's home NAT.
 - **Reliability is end-to-end.** Because SCTP does retransmission inside DTLS over the peer-to-peer path, lost
@@ -68,30 +68,30 @@ the two browsers, and at what layer, for a file transfer.**
    binding requests on the actual media socket — and picks the highest-priority pair that actually works
    (typically: direct UDP > NAT-adjusted UDP > TURN relay).
 - Reliability: checks run on a timer until a pair validates; failed pairs are discarded, so ICE always falls
-  through srflx → relay. If *every* pair fails, connection fails (this is our "failure demo" when TURN is disabled).
+  through srflx → relay. If *every* pair fails, connection fails (this is the "failure demo" when TURN is disabled).
 
 ### 2.5 WebRTC DataChannel (DCEP)
 - The DataChannel protocol is just framing on top of SCTP. It also negotiates parameters via SCTP (DATA_CHANNEL_OPEN,
-  ACK, etc.) and lets us set options — here `ordered: true`, `reliable: true`.
+  ACK, etc.) and lets the app set options — here `ordered: true`, `reliable: true`.
 - Why `ordered + reliable`: easiest to explain, and the retransmit/congestion control makes multi-GB transfers work
-  without the app-crash risk of hand-rolled UDP recovery. (Trade-off noted for the report: ordered delivery can
-  head-of-line-block after a loss burst; throughput over high-loss WAN is the same comparison we will measure.)
+  without the app-crash risk of hand-rolled UDP recovery. (Trade-off: ordered delivery can
+  head-of-line-block after a loss burst; throughput over high-loss WAN is the trade-off; the inspector surfaces loss and RTT so it can be observed.)
 
 ## 3. One packet, top to bottom (as seen on the wire)
 
 ```
   [ Ethernet ]  [ IP src=A:port  dst=B:port ]  [ UDP ]  [ DTLS record | AES-128-GCM ]
         [ SCTP chunk | DATA | ordered stream 0, TSN 1234 ]
-            [ DataChannel payload | {seq: 42, len: 16384, ...} ]  ← our header in the 16 KiB chunk
+            [ DataChannel payload | {seq: 42, len: 16384, ...} ]  ← the header in the 16 KiB chunk
 ```
 
 ## 4. Why this specific stack and not the alternatives
 
-| Alternative | Why we don't use it |
+| Alternative | Why it is not used |
 |---|---|
 | HTTP upload → server → HTTP download | Server sees and stores the file; bandwidth math is O(file) on the server; free-tier impossible. |
 | Raw WebSocket direct binary (no WebRTC) | Impossible: a WebSocket server is needed on at least one side; browsers can't listen for inbound WebSocket connections, so there's no P2P at all. |
-| WebRTC but unordered/unreliable DataChannel | Unordered is fine for chat/telemetry but ruins file integrity; we'd have to reimplement SeqNak + reassembly in app code anyway, and head-of-line is exactly what ordered SCTP does for us. |
+| WebRTC but unordered/unreliable DataChannel | Unordered is fine for chat/telemetry but ruins file integrity; it would mean reimplementing SeqNak + reassembly in app code anyway, and head-of-line is exactly what ordered SCTP already does. |
 | TCP hole-punching (no TURN) | Works only for easy NATs; TCP hole punching is unreliably supported through symmetric NAT / firewalls, and browsers forbid raw TCP sockets. UDP+ICE+TURN is the robust, standard approach. |
 
 ## 5. Where the security guarantees actually live

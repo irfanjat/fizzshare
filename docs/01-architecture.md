@@ -1,6 +1,6 @@
 # 01 — Architecture Overview
 
-## 1. What we are building
+## 1. What FizzShare does
 
 A **zero-server-resident peer-to-peer file transfer** web app. Two browser tabs (two users) establish a direct
 WebRTC DataChannel between them. The only things the server ever does are:
@@ -46,7 +46,7 @@ go browser-to-browser over UDP and the server sees nothing but STUN/TURN control
 |---|---|
 | WebRTC DataChannel instead of HTTP upload/download | DataChannels are SCTP-over-DTLS-over-UDP: built-in reliability, ordered delivery, and end-to-end encryption; bytes move peer-to-peer, so the server can't scale-limit or inspect file contents. This is exactly why ToffeeShare/ShareDrop-style apps work on free infrastructure. |
 | WebSocket signaling | The signaling channel is pure control-plane metadata. WebSocket is message-oriented (no HTTP request/response framing cost) and bidirectional, which is a natural fit for SDP/ICE exchange. TLS (wss) protects signaling and is also required for the browser to grant `RTCPeerConnection` secure-context APIs. |
-| Self-hosted coturn for STUN **and** TURN | Public Google/Cloudflare STUN servers are free but unreliable and give no relay capability. Splitting STUN (on 3478/udp) and TURN (3478/udp, 5349/tls + relay range) lets us demonstrate host → srflx → relay candidate progression and measure the relay overhead. |
+| Self-hosted coturn for STUN **and** TURN | Public Google/Cloudflare STUN servers are free but unreliable and give no relay capability. Splitting STUN (on 3478/udp) and TURN (3478/udp, 5349/tls + relay range) makes it possible to watch host → srflx → relay candidate progression and measure the relay overhead. |
 | Server-generated time-limited TURN credentials | TURN relays are bandwidth you pay for. Authenticating peers with HMAC-signed credentials (the [TURN REST API](https://datatracker.ietf.org/doc/html/draft-uberti-behave-turn-rest-00) convention) means a browser only gets a short-lived credential for the exact duration of a transfer and credentials can't be leaked from static page bundles. |
 | no-third-party-file-APIs, free-tier-only | The whole point of P2P is the server never carries load proportional to file size. One cheap t2.micro can serve unlimited concurrent transfers because traffic is P2P; only TURN-relayed transfers (worst case) consume server bandwidth. |
 

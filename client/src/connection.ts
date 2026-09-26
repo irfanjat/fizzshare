@@ -3,7 +3,7 @@
  *
  * Owns: iceServers config, trickled ICE candidate queue, offer/answer flow,
  * ICE restart on failure, and DataChannel creation (sender) / handoff
- * (receiver). Emits state transitions so the UI (and Phase 4 inspector) can
+ * (receiver). Emits state transitions so the UI (and the network inspector) can
  * show ICE/DTLS/connection states live.
  *
  * Trickle-ICE timing pitfall addressed here: candidates may arrive before the

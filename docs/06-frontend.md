@@ -1,4 +1,4 @@
-# 06 — Frontend & WebRTC Transfer (Phase 3)
+# 06 — Frontend & WebRTC Transfer
 
 **Location:** `client/` (TypeScript, esbuild bundle) → built output in `public/` (served by the signaling server in dev).
 
@@ -14,7 +14,7 @@
 | `src/sender.ts` | upload side: two-pass (hash then send), backpressure-aware chunk pump |
 | `src/receiver.ts` | download side: ordered chunk sink, incremental hash verify, orphan guard |
 | `src/filesink.ts` | File System Access API streaming sink, memory Blob fallback |
-| `src/stats.ts` | `getStats()` sampling (feeds Phase 4 inspector + telemetry) |
+| `src/stats.ts` | `getStats()` sampling (feeds the inspector + telemetry) |
 | `src/ui.ts` | DOM helpers, formatting, upload speed Welford speedometer |
 
 ## 2. Peer channel framing
@@ -49,7 +49,7 @@ hash without buffering the file in memory.
 
 ## 4. Backpressure
 
-Untamed, `send()` never blocks — buffered bytes balloon and the browser OOMs. Our pump:
+Untamed, `send()` never blocks — buffered bytes balloon and the browser OOMs. The pump:
 
 - after each send batch, waits until `bufferedAmount ≤ 1 MiB` (`bufferedAmountLowThreshold`), else yields to the
   event loop with a 250 ms ceiling so IPC/rendering stay responsive
@@ -88,10 +88,14 @@ used (documented limitation) so the flow stays prompt-free and unattended, match
 - The client only dials ICE servers handed to it by the signaling server it is already connected to (same-origin `/ws`).
 - Localhost is a secure context in Chrome/Firefox, so plain-HTTP dev still gets `showSaveFilePicker` + WebRTC.
 
-## 8. Verification performed (Phase 3)
+## 8. Verification performed
 
-- `client`: `npm test` → **11/11** (introduced during phase: incremental SHA-256; boundary, split, fuzz vectors)
-- `client`: `npm run typecheck` (tsc strict) and `npm run build` → `public/app.js` (~29 kB)
-- `server`: `npm test` → **24/24** (base URL moved to `/ws` after upgrade path check), `tsc` clean, live smoke:
+- `client`: `npm test` → **16/16** (incremental SHA-256; boundary, split, fuzz vectors), `npm run typecheck` (tsc strict) clean,
+  `npm run build` → `public/app.js` (~61 kB)
+- `server`: `npm test` → **28/28** (base URL moved to `/ws` after upgrade path check), `tsc` clean, live smoke:
   `/healthz`, static `/`, `app.js`, `/metrics`, full create-room → join-room → peer-joined round trip
-- Two real browsers / two devices: **manual E2E pending** (needs one-to-many LAN or two devices)
+- Automated E2E (`client/test/e2e/full.mjs`): headless Chrome picks a real file through the file input, creates a room,
+  reads the share link, confirms the QR matrix was painted, completes the transfer in a second tab, and re-hashes the
+  downloaded file to prove it is byte-identical. Passes against both a local server and the live deployment.
+- Cross-NAT: TURN relay path verified between two hosts on different networks (selected candidate pair reported as
+  `relay`, RTT sampled over the relayed path).

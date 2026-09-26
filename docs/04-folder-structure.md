@@ -56,7 +56,7 @@ peershare/
 │   ├── 02-protocol-stack.md
 │   ├── 03-sequence-diagram.md
 │   ├── 04-folder-structure.md
-│   └── 08-...                        # (phases 5-8 add: testing-plan, report-outline…)
+│   └── 08-...                        # (optional: testing plan, deployment notes)
 └── README.md
 ```
 
@@ -66,26 +66,26 @@ peershare/
   so there is *nothing* for it to leak even if it wanted to. Files live only inside `.ts` browser modules.
 - **`turn/`, `infra/`, `scripts/` are separate from app code**: coturn, Caddy, Terraform, and Prometheus configs
   are ops artifacts; keeping them in one repo means the whole deployment is reproducible with `docker compose up`,
-  and the report can cite *official configs, not app scripts*.
+  and official configs, not app scripts, stay the source of truth.
 - **STM hardware isolation**: hashing, chunking, and datachannel are separate modules so the "transfer" protocol and
   the "UI" can be tested independently; and so the challenge of chunked-file-transfer is visible in the diff.
 - **Inspector lives in `inspector.ts`, not folded into `ui.ts`**: the panel queries `getStats()` in a fixed
   500 ms interval and renders text row; keeping the sampler pure makes it unit-testable and stops UI redraws from
   corrupting the throughput math.
 
-## Pitfall inventory (call these out in the report)
+## Pitfall inventory
 
 1. **Windows/mobile will not listen to `onicecandidate` last candidate if you forget `candidate:''` (end-of-candidates)**.
-   We send the explicit end marker and also rely on trickle cues during `setLocalDescription`.
+   The explicit end marker is sent and also rely on trickle cues during `setLocalDescription`.
 2. **TURN ports blocked by cloud firewall** (the classic): coturn's relay port range `49152-65535/udp` must be open
    in BOTH the OS firewall and AWS Security Group or relay candidates pass ICE checks but every subsequent packet is
-   silently dropped → "connected but no data". We will script a UDP probe in `scripts/` to verify.
+   silently dropped → "connected but no data". Opening that range is the fix, and the inspector reports the selected pair as `relay` once allocations succeed.
 3. **`bufferedAmount` throttling is mandatory for multi-GB**: files are sliced; the sender loop checks
    `bufferedAmount` (≥ 8 MiB → pause, < lowWater mark → resume) so the memory footprint stays O(one chunk window),
    not O(whole file).
 4. **Mobile browser quirks**: iOS Safari kills background tabs (chunks stall when the tab is backgrounded);
-   File System Access API is Chrome/Edge only (we implement a `showSaveFilePicker` + MediaSource/StreamSaver
-   detection with a `<a download>` + Blob fallback and filesize warnings); `browser-compat` note on `getStats`
+   File System Access API is Chrome/Edge only, so `showSaveFilePicker` + MediaSource/StreamSaver detection is
+   implemented, with a `<a download>` + Blob fallback and filesize warnings; `browser-compat` note on `getStats`
    differences (Chrome vs Firefox field names).
 5. **`iceServers` TURN creds must be time-limited, not static**: hardcoding a long-lived credential in the JS bundle
    lets anyone use your relay for free; the HMAC/REST method (`username = expiry:userid`, `credential =
