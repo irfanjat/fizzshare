@@ -50,7 +50,7 @@ services:
       TURN_UDP_PORT: "3478"
       TURN_TLS_PORT: "5349"
       TURN_LIFETIME_SEC: "${TURN_LIFETIME_SEC:-3600}"
-      ROOM_TTL_SEC: "900"
+      ROOM_TTL_SEC: "${ROOM_TTL_SEC:-3600}"
       LOG_LEVEL: "${LOG_LEVEL:-info}"
     healthcheck:
       test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:8080/healthz').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
