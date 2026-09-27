@@ -646,6 +646,9 @@ class App {
 
   private setConnStateLabel(state: string): void {
     $('#conn-state').textContent = state;
+    // DTLS descriptions only exist once the transport is up, so the safety
+    // codes can only be rendered from here on (not when the link is opened).
+    if (state === 'connected') this.renderSafety();
   }
 
   private log(text: string, kind = ''): void {
