@@ -285,6 +285,14 @@ class App {
         this.manager.onCandidate = (c) => this.sendIce(c);
         this.mountInspector();
         this.showRoom();
+        // ?policy=relay|host stages the candidate policy before any peer
+        // connection exists, so the FIRST negotiation already uses it (no
+        // mid-session rebuild). Handy for demoing/verifying the TURN fallback.
+        const urlPolicy = new URLSearchParams(location.search).get('policy');
+        if (urlPolicy === 'relay' || urlPolicy === 'host' || urlPolicy === 'auto') {
+          this.applyIcePolicy(urlPolicy);
+          this.log(`candidate policy "${urlPolicy}" from URL`);
+        }
         if (msg.type === 'room-joined') {
           this.log('joined room — waiting for peer to connect');
           void this.manager.prepareAsAnswerer(this.effectiveServers);
