@@ -150,10 +150,16 @@ export class PeerConnectionManager {
     sendOffer(offer.sdp!);
   }
 
-  /** ICE restart after failure: re-gather and renegotiate from the offerer. */
-  public async restartIce(sendOffer: (sdp: string) => void): Promise<void> {
-    if (!this.pc || this.restartInFlight) return;
+  /**
+   * ICE restart after failure: re-gather and renegotiate from the offerer.
+   * Enforces its own budget and re-entrancy guard, so it is safe to call once
+   * per 'failed' phase. Returns false when no restart was started.
+   */
+  public async restartIce(sendOffer: (sdp: string) => void): Promise<boolean> {
+    if (!this.pc || this.restartInFlight) return false;
+    if (this.restartAttempts >= PeerConnectionManager.MAX_RESTARTS) return false;
     this.restartInFlight = true;
+    this.restartAttempts += 1;
     try {
       this.pc.restartIce();
       this.remoteDescSet = false;
@@ -162,8 +168,10 @@ export class PeerConnectionManager {
       await this.pc.setLocalDescription(offer);
       this.emit('connecting', 're-offer sent');
       sendOffer(offer.sdp!);
+      return true;
     } catch (err) {
       this.emit('failed', `ICE restart failed: ${(err as Error).message}`);
+      return false;
     } finally {
       this.restartInFlight = false;
     }
@@ -249,16 +257,12 @@ export class PeerConnectionManager {
           this.emit('disconnected', 'ICE disconnected (path degraded)');
           break;
         case 'failed':
+          // The offerer (sender) actually performs the restart via
+          // main.ts -> restartIce(); we only report the state change here.
+          // Important: do NOT set restartInFlight in this branch — doing so
+          // deadlocked restartIce() (its re-entrancy flag was already true
+          // before the call) so the self-heal never actually ran.
           this.emit('failed', 'ICE failed');
-          // Self-heal with a hard cap so a persistently-failing network cannot
-          // trigger an infinite restart/negotiation loop (see MAX_RESTARTS).
-          if (this.restartAttempts < PeerConnectionManager.MAX_RESTARTS && !this.restartInFlight) {
-            this.restartAttempts += 1;
-            this.restartInFlight = true;
-            this.events.onPhase('failed', 'automatic ICE restart triggered', Date.now());
-          } else {
-            this.emit('failed', 'ICE restart exhausted — giving up');
-          }
           break;
         default:
           break;
