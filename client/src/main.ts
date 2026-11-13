@@ -412,7 +412,7 @@ class App {
     const pc = this.manager?.peerConnection;
     if (!pc) return;
     const get = (d: RTCSessionDescription | null | undefined): string | null => {
-      const m = /a=fingerprint:([0-9A-Fa-f:]+)/.exec(d?.sdp ?? '');
+      const m = /a=fingerprint:[A-Za-z0-9-]+\s+([0-9A-Fa-f:]+)/i.exec(d?.sdp ?? '');
       return m ? m[1]!.toLowerCase() : null;
     };
     const local = get(pc.localDescription);
