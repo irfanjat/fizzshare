@@ -5,11 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
   <title>FizzShare — Share files privately, fast and without size limit</title>
   <meta name="description" content="FizzShare sends your files privately and fast. No file size limit. No registration. Peer to peer. End to end encrypted." />
-  <meta name="theme-color" content="#b9e93c" />
+  <meta name="theme-color" content="#071412" />
+  <meta name="color-scheme" content="dark" />
   <link rel="icon" href="data:," />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Roboto:wght@300;400;500;600;700&display=swap" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Sora:wght@400;500;600;700;800&display=swap" />
   <link rel="stylesheet" href="/style.css" />
 </head>
 <body class="main">
@@ -17,9 +18,15 @@
     <div class="noscript"><h1>Oops</h1><span>you need to enable javascript to use FizzShare.</span></div>
   </noscript>
 
-  <!-- Fizzy backdrop: rising bubbles -->
-  <div id="bubbles" aria-hidden="true">
-    <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+  <!-- Aurora glass backdrop -->
+  <div class="bg" aria-hidden="true">
+    <span class="orb orb-a"></span>
+    <span class="orb orb-b"></span>
+    <span class="orb orb-c"></span>
+    <span class="orb orb-d"></span>
+    <span class="orb orb-e"></span>
+    <div class="bg-grid"></div>
+    <div class="grain"></div>
   </div>
 
   <header class="app-header">
@@ -68,8 +75,14 @@
         </div>
         <div class="right">
           <div class="right-centered">
+            <div class="hero-kicker">
+              <span class="kicker-dot" aria-hidden="true"></span>
+              <span>Peer-to-peer</span>
+              <span class="kicker-sep" aria-hidden="true"></span>
+              <span>End-to-end encrypted</span>
+            </div>
             <h1>Share files straight from your device.</h1>
-            <p class="description">Send files of any size directly from your device. Nothing is stored online — close your browser and it stops. Fizzy simple.</p>
+            <p class="description">Send files of any size directly from your device. <strong>Nothing is stored online</strong> — close your browser and it stops. <span class="description-accent">Fizzy simple.</span></p>
             <div class="features">
               <div class="feature"><span class="feature-dot"></span><span>No size limit</span></div>
               <div class="feature"><span class="feature-dot"></span><span>Peer-to-peer</span></div>
