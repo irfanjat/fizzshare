@@ -2,7 +2,7 @@
 
 **Send a file from your phone to a laptop with nothing in between.** No account, no upload bar, no "file too large" error. You pick the files, you get a link (and a QR code), the other person opens it, and the bytes go straight between the two devices. Close the tab and the transfer is gone — because there is nowhere it was ever stored.
 
-Live right now: **https://52.4.112.224.sslip.io/**
+Live right now: **https://3.229.48.172.sslip.io/**
 
 The interesting part was never the UI. It was making two browsers on two completely different networks actually find each other — and then making that failure mode visible instead of mysterious.
 
