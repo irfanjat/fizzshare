@@ -31,6 +31,7 @@ interface SignalingDeps {
   metrics: Metrics;
   logger: Logger;
   msgLimiter: TokenBucket;
+  joinsLimiter: TokenBucket;
 }
 
 export interface ServerNotice {
@@ -129,7 +130,7 @@ export class SignalingRouter {
 
     this.deps.metrics.inc('peershare_join_attempts_total', 'Join attempts', { result: 'attempted' });
 
-    if (!this.deps.msgLimiter.consume(`${session.ip}/join`)) {
+    if (!this.deps.joinsLimiter.consume(session.ip)) {
       sendJson(session.ws, { type: 'error', error: 'JOIN_RATE_LIMITED', message: 'Too many join attempts, try again later' });
       return null;
     }

@@ -49,6 +49,8 @@ export interface Config {
   maxPeersPerRoom: number;
   roomCodeLength: number;
   maxPayloadBytes: number;
+  /** Hard ceiling on simultaneous WebSocket control-plane connections. */
+  maxConnections: number;
   turn: TurnConfig | null;
   rateLimit: RateLimitConfig;
   logLevel: string;
@@ -113,6 +115,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
     maxPeersPerRoom: intEnv('ROOM_MAX_PEERS', 2),
     roomCodeLength: intEnv('ROOM_CODE_LENGTH', 6),
     maxPayloadBytes: intEnv('WS_MAX_PAYLOAD_BYTES', 1024 * 1024),
+    maxConnections: intEnv('MAX_WS_CONNECTIONS', 200),
     turn,
     rateLimit: {
       messagesPerMinute: intEnv('MSG_RATE_PER_MIN', 600),

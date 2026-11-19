@@ -52,6 +52,14 @@ services:
       TURN_LIFETIME_SEC: "${TURN_LIFETIME_SEC:-3600}"
       ROOM_TTL_SEC: "${ROOM_TTL_SEC:-3600}"
       LOG_LEVEL: "${LOG_LEVEL:-info}"
+      MAX_WS_CONNECTIONS: "${MAX_WS_CONNECTIONS:-200}"
+      JOIN_RATE_PER_MIN: "${JOIN_RATE_PER_MIN:-8}"
+    mem_limit: 512M
+    ulimits:
+      nofile:
+        soft: 4096
+        hard: 8192
+    stop_grace_period: 10s
     healthcheck:
       test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:8080/healthz').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
       interval: 10s
@@ -72,7 +80,8 @@ services:
       - caddy_data:/data
       - caddy_config:/config
     depends_on:
-      - signaling
+      signaling:
+        condition: service_healthy
 
 volumes:
   caddy_data:

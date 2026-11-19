@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
   <title>FizzShare — Share files privately, fast and without size limit</title>
   <meta name="description" content="FizzShare sends your files privately and fast. No file size limit. No registration. Peer to peer. End to end encrypted." />
-  <meta name="theme-color" content="#071412" />
-  <meta name="color-scheme" content="dark" />
+  <meta name="theme-color" content="#f4f8ff" />
+  <meta name="color-scheme" content="light" />
   <link rel="icon" href="data:," />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -100,16 +100,80 @@
           <p class="eyebrow">How it works</p>
           <h2>What is FizzShare?</h2>
           <p class="text-explained">
-            FizzShare is a peer-to-peer file sharing service built for a Computer Networks term project.
-            Your files travel over WebRTC — SCTP/DTLS/ICE — straight from one device to the other.
-            We store nothing online: simply close your browser to stop sending.
+            We are a free and independent peer-to-peer (P2P) file sharing service that prioritizes your
+            privacy and keeps your data safe. We store nothing online: simply close your browser to stop
+            sending. Our mission is to keep your data safely in your own hands, as it should be.
           </p>
           <p class="secure hidden" id="secure-note"><b>Hostile origin:</b> this page is not served over HTTPS, so WebRTC is disabled. Ask the host for the secure link.</p>
+
+          <div class="data-flow" role="img" aria-label="The sender and receiver exchange file data directly over WebRTC. The signaling server only shares a code and connection addresses, never the file.">
+            <svg viewBox="0 0 920 300" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <defs>
+                <linearGradient id="flowGrad" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%" stop-color="#0891b2" />
+                  <stop offset="50%" stop-color="#0d9488" />
+                  <stop offset="100%" stop-color="#4d7c0f" />
+                </linearGradient>
+                <filter id="flowGlow" x="-20%" y="-80%" width="140%" height="260%">
+                  <feGaussianBlur stdDeviation="6" result="blur" />
+                  <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
+                </filter>
+                <marker id="arrowHead" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                  <path d="M 0 0 L 10 5 L 0 10 z" fill="#0d9488" />
+                </marker>
+              </defs>
+
+              <g>
+                <rect x="45" y="54" width="220" height="112" rx="20" fill="rgba(255,255,255,.045)" stroke="rgba(255,255,255,.20)" />
+                <circle cx="82" cy="91" r="15" fill="rgba(201,244,90,.16)" stroke="rgba(201,244,90,.6)" />
+                <path class="flow-icon" d="M75 91h14M82 84v14" stroke="#c9f45a" stroke-width="2" stroke-linecap="round" />
+                <text class="flow-node-title" x="108" y="96" fill="#ecf7f1" font-size="17" font-weight="600" font-family="Sora, Inter, sans-serif">Sender</text>
+                <text class="flow-note" x="70" y="134" fill="rgba(224,243,234,.62)" font-size="13" font-family="Inter, sans-serif">Your device · files stay here</text>
+              </g>
+
+              <g>
+                <rect x="655" y="54" width="220" height="112" rx="20" fill="rgba(255,255,255,.045)" stroke="rgba(255,255,255,.20)" />
+                <circle cx="692" cy="91" r="15" fill="rgba(87,200,255,.16)" stroke="rgba(87,200,255,.6)" />
+                <path class="flow-icon" d="M692 83v16M685 92l7 7 7-7" stroke="#57c8ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                <text class="flow-node-title" x="718" y="96" fill="#ecf7f1" font-size="17" font-weight="600" font-family="Sora, Inter, sans-serif">Receiver</text>
+                <text class="flow-note" x="680" y="134" fill="rgba(224,243,234,.62)" font-size="13" font-family="Inter, sans-serif">Their device · downloads directly</text>
+              </g>
+
+              <path class="flow-line" d="M270 110 H650" fill="none" stroke="url(#flowGrad)" stroke-width="4" stroke-linecap="round" filter="url(#flowGlow)" marker-end="url(#arrowHead)" />
+              <text class="flow-file-label" x="460" y="86" text-anchor="middle" fill="#d9fff2" font-size="13" font-weight="600" letter-spacing="1.6" font-family="Inter, sans-serif">FILE DATA · WEBRTC / DTLS</text>
+              <text class="flow-note" x="460" y="139" text-anchor="middle" fill="rgba(224,243,234,.55)" font-size="13" font-family="Inter, sans-serif">No upload. No cloud copy. Direct device-to-device.</text>
+
+              <g>
+                <rect class="flow-server-box" x="338" y="206" width="244" height="70" rx="18" fill="rgba(91,227,192,.07)" stroke="rgba(91,227,192,.34)" />
+                <text class="flow-node-title" x="460" y="235" text-anchor="middle" fill="#ecf7f1" font-size="15" font-weight="600" font-family="Sora, Inter, sans-serif">Signaling / STUN server</text>
+                <text class="flow-note" x="460" y="257" text-anchor="middle" fill="rgba(224,243,234,.55)" font-size="12" font-family="Inter, sans-serif">code + connection addresses only</text>
+              </g>
+
+              <path class="flow-meta" d="M190 166 C220 190 300 206 350 216" fill="none" stroke="rgba(255,255,255,.22)" stroke-width="1.6" stroke-dasharray="5 7" />
+              <path class="flow-meta" d="M730 166 C700 190 620 206 570 216" fill="none" stroke="rgba(255,255,255,.22)" stroke-width="1.6" stroke-dasharray="5 7" />
+              <text class="flow-meta-label" x="460" y="192" text-anchor="middle" fill="rgba(224,243,234,.45)" font-size="11" letter-spacing="1.2" font-family="Inter, sans-serif">OFFER · ANSWER · ICE — NEVER THE FILE</text>
+            </svg>
+          </div>
+          <p class="flow-caption">The server only introduces the two browsers. The file itself travels straight across the direct WebRTC path.</p>
+
           <div class="divider-fizz"></div>
-          <div class="hero-grid">
-            <div class="item-info"><div class="container-circle-icon"><div class="img-info">📦</div></div><div class="block-info"><h3>Shared straight from your device</h3><p>WebRTC finds the shortest path between sender and receiver — sometimes your data never even leaves the building.</p></div></div>
-            <div class="item-info"><div class="container-circle-icon"><div class="img-info">📏</div></div><div class="block-info"><h3>No more file size limits</h3><p>Because we never store the data, there's nothing to limit. Share files of any size, mindful of your own data usage.</p></div></div>
-            <div class="item-info"><div class="container-circle-icon"><div class="img-info">🔒</div></div><div class="block-info"><h3>Only the receiver can read it</h3><p>DTLS-encrypted end to end, plus a per-file SHA-256 checksum both sides verify after every transfer.</p></div></div>
+          <div class="hero-grid hero-grid-4">
+            <div class="item-info">
+              <div class="container-circle-icon"><div class="img-info"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="2" /><path d="M8 20h8M12 16v4M8 10h8M13 7l3 3-3 3" /></svg></div></div>
+              <div class="block-info"><h3>Files are shared straight from your device</h3><p>When you close the browser tab your files are no longer accessible. FizzShare uses WebRTC — SCTP/DTLS/ICE — to find the shortest path, meaning sometimes your data doesn't even have to leave the building.</p></div>
+            </div>
+            <div class="item-info">
+              <div class="container-circle-icon"><div class="img-info">∞</div></div>
+              <div class="block-info"><h3>No more file size limits</h3><p>Because we don't store the data, there's no need for file size limits. Share files of any size or amount — just keep an eye on your own data usage.</p></div>
+            </div>
+            <div class="item-info">
+              <div class="container-circle-icon"><div class="img-info"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="10" width="14" height="10" rx="2" /><path d="M8 10V7a4 4 0 0 1 8 0v3" /></svg></div></div>
+              <div class="block-info"><h3>Only the receiver can access your files</h3><p>Only you and the receiver can access your files. Your data is encrypted end-to-end with DTLS, and a per-file SHA-256 checksum is verified on both sides after every transfer.</p></div>
+            </div>
+            <div class="item-info">
+              <div class="container-circle-icon"><div class="img-info"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19c0-7 5-12 14-13 0 9-5 14-12 14-1 0-2-.4-2-1z" /><path d="M5 19c3-4 6-6 10-8" /></svg></div></div>
+              <div class="block-info"><h3>Low environmental impact</h3><p>Because we don't store data we don't need bulky servers, and that saves a lot of energy. Sharing with FizzShare has a much smaller carbon footprint than using a cloud storage provider.</p></div>
+            </div>
           </div>
         </div>
       </div>

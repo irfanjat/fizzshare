@@ -76,6 +76,12 @@ export class SignalingTransport {
         socket.destroy();
         return;
       }
+      if (this.sessions.size >= opts.cfg.maxConnections) {
+        opts.logger.warn('ws-cap-rejected', { ip, active: this.sessions.size, cap: opts.cfg.maxConnections });
+        socket.write('HTTP/1.1 503 Service Unavailable\r\nConnection: close\r\nRetry-After: 5\r\n\r\n');
+        socket.destroy();
+        return;
+      }
       this.wss.handleUpgrade(req, socket, head, (ws) => this.attach(ws, req));
     });
 

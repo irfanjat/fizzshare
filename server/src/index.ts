@@ -51,6 +51,7 @@ export function buildServer(config = loadConfig()): ServerHandle {
     metrics,
     logger,
     msgLimiter: rateLimiter.messages,
+    joinsLimiter: rateLimiter.joins,
   });
 
   const app = express();
@@ -95,6 +96,9 @@ export function buildServer(config = loadConfig()): ServerHandle {
   });
 
   const server = http.createServer(app);
+  server.requestTimeout = 20_000;
+  server.headersTimeout = 25_000;
+  server.keepAliveTimeout = 65_000;
   const transport = new SignalingTransport(server, {
     cfg: config,
     registry,
